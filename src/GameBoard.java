@@ -14,80 +14,60 @@ public class GameBoard extends JPanel{
     private int FPS = 60;
     private int x;
     private int y;
-    private int R = 2;//range
-    private int T = 5;//threshold
-    private int C = 8;//states
+    private int R;//range
+    private int T;//threshold
+    private int C;//states
     private int u;
     private boolean isMOORE = true;
     private CyclicAutomata game;
     private Color[] colorList;
     private Timer timer;
+
     public GameBoard(int x, int y, int u){
-        if(isMOORE){
-            game = new CyclicAutomata(x, y, R, T, C, CyclicAutomata.MOORE);
-        }
-        else{
-            game = new CyclicAutomata(x, y, R, T, C, CyclicAutomata.NEUMAN);
-        }
+        this.x = x;
+        this.y = y;
+        this.u = u;
+    }
+
+    public void run(){
+        game = new CyclicAutomata(x, y, R, T, C, isMOORE);
+
+        //setting a random map
         int[][] map = new int[x][y];
         for (int i = 0; i < map.length; i++) {
             for (int j = 0; j < map[0].length; j++) {
                 map[i][j] = (int)(Math.random()*C);
-//              map[i][j] = 0;
             }
         }
-//        map[x/2][y/2] = 1;
-//        map[x/2][y/2+1] = 2;
         game.setMap(map);
 
-
+        //give each state a color
         colorList = new Color[C];
         for (int i = 0; i < C; i++) {
             int color = (int)((i*1.0/(1.0*C))*255);
             colorList[i] = new Color(color/C, color, 0);
         }
 
-        this.x = x;
-        this.y = y;
-        this.u = u;
+        //start the simulation
         timer = new Timer(1000/FPS, new BoardListener());
         timer.start();
     }
 
     public void paint(Graphics g)
     {
-
         super.paint(g);
-        //draw the grid
-        g.setColor(Color.white);
-        g.drawRect(0, 0, x*u, y*u);
-        for(int i = 0; i< y; i++)
-        {
-            g.drawLine(0, i*u, x*u, i*u);
-        }
-        for(int i = 0; i< x; i++)
-        {
-            g.drawLine(i*u,i*u,x*u,y*u);
-        }
-
         drawBlocks(g);
-
-
     }
 
     public void drawBlocks(Graphics g) {
-
-
         int[][] map  = game.getMap();
         for(int i = 0; i< map.length; i++)
         {
             for(int j = 0; j<map[0].length; j++)
             {
-
                     Color currentColor = colorList[map[i][j]];
                      g.setColor(currentColor);
                     g.fillRect(i*u, j*u, u, u);
-
 
             }
         }
@@ -106,5 +86,69 @@ public class GameBoard extends JPanel{
                 timer.stop();
             }
         }
+    }
+
+    public int getR() {
+        return R;
+    }
+
+    public GameBoard setR(int r) {
+        R = r;
+        return this;
+    }
+
+    public int getT() {
+        return T;
+    }
+
+    public GameBoard setT(int t) {
+        T = t;
+        return this;
+    }
+
+    public int getC() {
+        return C;
+    }
+
+    public GameBoard setC(int c) {
+        C = c;
+        return this;
+    }
+
+    public int getU() {
+        return u;
+    }
+
+    public GameBoard setU(int u) {
+        this.u = u;
+        return this;
+    }
+
+    public int getFPS() {
+        return FPS;
+    }
+
+    public GameBoard setFPS(int FPS) {
+        this.FPS = FPS;
+        return this;
+    }
+
+
+    public void setWidth(int x) {
+        this.x = x;
+    }
+
+
+    public void setHeight(int y) {
+        this.y = y;
+    }
+
+    public boolean isMOORE() {
+        return isMOORE;
+    }
+
+    public GameBoard setIsMOORE(boolean isMOORE) {
+        this.isMOORE = isMOORE;
+        return this;
     }
 }

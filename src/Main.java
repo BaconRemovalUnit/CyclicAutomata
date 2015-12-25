@@ -14,12 +14,14 @@ public class Main {
         int y = 500;//600
         int y_adj = 10;//100
         int u = 2;
-        JFrame frame = new JFrame("Game of Life");
+        JFrame frame = new JFrame("Cyclic Automata");
         frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-        frame.getContentPane().add(new GameBoard(x,y,u));
+        GameBoard board = new GameBoard(x,y,u);
+        board.setR(1).setT(2).setC(5).setIsMOORE(true).setFPS(10);
+        board.run();
+        frame.getContentPane().add(board);
         frame.setSize(x*u+x_adj,y*u+y_adj);
         frame.setLocationRelativeTo(null);
-//        frame.setResizable(false);
         frame.setVisible(true);
     }
 }
