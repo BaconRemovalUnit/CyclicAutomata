@@ -1,4 +1,5 @@
 import javax.swing.*;
+import java.awt.*;
 
 /**
  * University of Rochester
@@ -14,14 +15,21 @@ public class Main {
         int y = 500;//600
         int y_adj = 10;//100
         int u = 2;
+
+        //r3t5c20
         JFrame frame = new JFrame("Cyclic Automata");
         frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-        GameBoard board = new GameBoard(x,y,u);
-        board.setR(1).setT(2).setC(5).setIsMOORE(true).setFPS(10);
+        GameBoard board = new GameBoard();
         board.run();
+
         frame.getContentPane().add(board);
-        frame.setSize(x*u+x_adj,y*u+y_adj);
-        frame.setLocationRelativeTo(null);
+//        frame.setSize(x*u+x_adj,y*u+y_adj);
+//        frame.setLocationRelativeTo(null);
+//        frame.setLayout(new FlowLayout());
+        frame.addKeyListener(board);
+        frame.setUndecorated(true);
+        Dimension d = Toolkit.getDefaultToolkit().getScreenSize();
+        frame.setSize(d.width, d.height);
         frame.setVisible(true);
     }
 }

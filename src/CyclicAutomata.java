@@ -2,6 +2,7 @@ import com.sun.xml.internal.ws.client.MonitorRootClient;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.HashMap;
 import java.util.Iterator;
 
 /**
@@ -19,6 +20,8 @@ public class CyclicAutomata {
     public static final boolean NEUMAN = !MOORE;
     //the game grid
     private int[][] map;
+    private boolean[][] refresh;
+
 
     //neighbourhood range
     private int R;
@@ -36,10 +39,18 @@ public class CyclicAutomata {
 
     CyclicAutomata(int x, int y, int R, int T, int C, boolean N){
         this.map = new int[x][y];
+        this.refresh = new boolean[x][y];
         this.R = R;
         this.T = T;
         this.C = C;
         this.N = N;
+
+        for (int i = 0; i < map.length; i++) {
+            for (int j = 0; j < map[0].length; j++) {
+                map[i][j] = (int)(Math.random()*C);
+                refresh[i][j] = true;
+            }
+        }
     }
 
     //updates the map based on the conditions
@@ -54,14 +65,19 @@ public class CyclicAutomata {
         //updating the newMap
         for(int i = 0; i< map.length; i ++){
             for (int j = 0; j < map[0].length; j++) {
-                int count = countValidNeighbours(i, j);
-
-                if(count>=this.T){
-                    stopped = false;
-                    //gets eaten by the new value
-                    newMap[i][j]++;
-                    if(newMap[i][j]>C-1){
-                        newMap[i][j] = 0;
+                if(refresh[i][j]) {
+                    int count = countValidNeighbours(i, j);
+                    if (count >= this.T) {
+                        refreshValidNeighbours(i,j);
+                        stopped = false;
+                        //gets eaten by the new value
+                        newMap[i][j]++;
+                        if (newMap[i][j] > C - 1) {
+                            newMap[i][j] = 0;
+                        }
+                    }
+                    else {
+                        refresh[i][j] = false;
                     }
                 }
             }
@@ -103,6 +119,31 @@ public class CyclicAutomata {
             }
         }
         return counter;
+    }
+
+    public void refreshValidNeighbours(int x, int y){
+        if(N==MOORE){//moore neighborhood
+            for(int i = x-R; i <= x+R; i++){
+                for (int j = y-R; j <= y+R; j++) {
+                    //bounded by the map
+                    if(!(i<0||i>=map.length||j<0||j>=map[0].length)){
+                        refresh[i][j] = true;
+                    }
+                }
+            }
+        }
+        else{//von neuman neighborhood
+            for(int i = x-R; i <= x+R; i++){
+                for (int j = y-R; j <= y+R; j++) {
+                    //bounded by the map
+                    if(!(i<0||i>=map.length||j<0||j>=map[0].length)){
+                        if((Math.abs(x-i)+Math.abs(y-j))<=R){
+                            refresh[i][j] = true;
+                        }
+                    }
+                }
+            }
+        }
     }
 
     public boolean isStopped() {
@@ -147,5 +188,13 @@ public class CyclicAutomata {
 
     public void setN(boolean n) {
         N = n;
+    }
+
+    public boolean[][] getRefresh() {
+        return refresh;
+    }
+
+    public void setRefresh(boolean[][] refresh) {
+        this.refresh = refresh;
     }
 }
