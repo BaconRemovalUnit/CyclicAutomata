@@ -103,7 +103,7 @@ public class CyclicAutomata {
                     }
                 }
             }
-            }
+        }
         else{//von neuman neighborhood
             for(int i = x-R; i <= x+R; i++){
                 for (int j = y-R; j <= y+R; j++) {

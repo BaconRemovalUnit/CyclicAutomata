@@ -23,9 +23,6 @@ public class Main {
         board.run();
 
         frame.getContentPane().add(board);
-//        frame.setSize(x*u+x_adj,y*u+y_adj);
-//        frame.setLocationRelativeTo(null);
-//        frame.setLayout(new FlowLayout());
         frame.addKeyListener(board);
         frame.setUndecorated(true);
         Dimension d = Toolkit.getDefaultToolkit().getScreenSize();

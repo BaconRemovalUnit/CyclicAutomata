@@ -10,7 +10,7 @@ import java.io.IOException;
         * GameBoard
         */
 public class GameBoard extends JPanel implements KeyListener{
-    private boolean stopped;
+//    private boolean toggleInactiveCells = true;
     private int FPS;
     private int x;
     private int y;
@@ -22,17 +22,17 @@ public class GameBoard extends JPanel implements KeyListener{
     private int timeLimit = 200;//maximum seconds
     private long beginTime;
     //each slot of the rules represents R,T,C,N,timeLimit
-    //{3,5,19,1,200},{2,11,3,1,180},{4,20,2,0,120},{2,5,3,0,60},{2,4,5,1,20},{2,5,8,1,20}
-    private int[][] rules = {{3,5,19,1,200},{2,11,3,1,180},{4,21,2,0,120},{2,5,3,0,60},{2,4,5,1,20},{2,5,8,1,120}};
+    //{3,5,19,1,240},{2,11,3,1,180},{4,21,2,0,60},{2,1,40,0,120},{2,5,3,0,60},{2,4,5,1,30},{2,5,8,1,60},{2,2,19,1,30},{4,6,19,1,50},{3,1,150,1,180},{3,1,100,1,30}
+    private int[][] rules = {{3,5,19,1,240},{2,11,3,1,180},{4,21,2,0,60},{2,1,40,0,120},{2,5,3,0,60},{2,4,5,1,30},{2,5,8,1,60},{2,2,19,1,30},{4,6,19,1,50},{3,1,150,1,180},{3,1,100,1,30}};
     private CyclicAutomata game;
     private Color[] colorList;
     private Timer timer;
 
     public GameBoard(){
         Dimension screensize = Toolkit.getDefaultToolkit().getScreenSize();
-        this.x = (int)screensize.getWidth()/2;
-        this.y = (int)screensize.getHeight()/2;
-        this.u = 2;
+        this.x = (int)screensize.getWidth()/3;
+        this.y = (int)screensize.getHeight()/3;
+        this.u = 3;
         this.FPS = 15;
         int currentRule = (int)(Math.random()*rules.length);
         this.R = rules[currentRule][0];
@@ -60,12 +60,10 @@ public class GameBoard extends JPanel implements KeyListener{
         //give each state a color
         colorList = new Color[C];
         for (int i = 0; i < C; i++) {
-            int color = (int)((i*1.0/(1.0*C))*255);
-//            colorList[i] = new Color(color, color/C, 0);
             int R = (int)(Math.random()*255);
             int G = (int)(Math.random()*255);
             int B = (int)(Math.random()*255);
-                colorList[i] = new Color(R,G,B);
+            colorList[i] = new Color(R,G,B);
         }
 
         //start the simulation
@@ -76,20 +74,23 @@ public class GameBoard extends JPanel implements KeyListener{
     }
 
     public void paintComponent(Graphics g) {
-
-        drawBlocks(g);
-    }
-
-    public void drawBlocks(Graphics g) {
         boolean[][] update = game.getRefresh();
         int[][] map  = game.getMap();
         for(int i = 0; i< map.length; i++) {
             for(int j = 0; j<map[0].length; j++) {
-//                if(update[i][j]) {
+                if(update[i][j]) {
                     Color currentColor = colorList[map[i][j]];
                     g.setColor(currentColor);
-//                    g.setColor(new Color((int)(Math.random()*256),(int)(Math.random()*256),(int)(Math.random()*256)));
                     g.fillRect(i * u, j * u, u, u);
+                }
+//                else if(!toggleInactiveCells){
+//                    g.setColor(Color.black);
+//                    g.fillRect(i * u, j * u, u, u);
+//                }
+//                else {
+//                    Color currentColor = colorList[map[i][j]];
+//                    g.setColor(currentColor);
+//                    g.fillRect(i * u, j * u, u, u);
 //                }
             }
         }
@@ -100,8 +101,9 @@ public class GameBoard extends JPanel implements KeyListener{
             game.update();
 
             int timeElapsed = (int)((System.currentTimeMillis() - beginTime)/1000);
-            if(!game.isStopped()&&timeElapsed<timeLimit)
-            repaint();
+            if(!game.isStopped()&&timeElapsed<timeLimit) {
+                repaint();
+            }
             else {
                 timer.stop();
                 resetRules();
@@ -117,7 +119,6 @@ public class GameBoard extends JPanel implements KeyListener{
     }
 
     private void resetRules(){
-        
         int ruleNumber = (int)(Math.random()*rules.length);
         int[] rule = rules[ruleNumber];
         //each slot of the rules represents R,T,C,N,timeLimit
@@ -192,34 +193,34 @@ public class GameBoard extends JPanel implements KeyListener{
 
     @Override
     public void keyTyped(KeyEvent e) {
-        try{
-            Runtime.getRuntime().exec("RunDll32.exe user32.dll,LockWorkStation");
-        }
-        catch (IOException err){
-            err.printStackTrace();
-        }
-        System.exit(0);
     }
 
     @Override
     public void keyPressed(KeyEvent e) {
-        try{
-            Runtime.getRuntime().exec("RunDll32.exe user32.dll,LockWorkStation");
+        switch (e.getKeyCode()){
+            case KeyEvent.VK_SPACE:
+                timer.stop();
+                resetRules();
+                run();
+                break;
+//            case KeyEvent.VK_CAPS_LOCK:
+//                toggleInactiveCells = !toggleInactiveCells;
+//                break;
+            default:
+                try{
+                    Runtime.getRuntime().exec("RunDll32.exe user32.dll,LockWorkStation");
+                }
+                catch (IOException err){
+                    err.printStackTrace();
+                }
+                System.exit(0);
+
         }
-        catch (IOException err){
-            err.printStackTrace();
-        }
-        System.exit(0);
+//        }
     }
 
     @Override
     public void keyReleased(KeyEvent e) {
-        try{
-            Runtime.getRuntime().exec("RunDll32.exe user32.dll,LockWorkStation");
-        }
-       catch (IOException err){
-           err.printStackTrace();
-       }
-        System.exit(0);
+
     }
 }
